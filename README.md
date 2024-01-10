@@ -9,11 +9,7 @@ A tool to dump all contents of an public/exposed/open bucket
                   |  '-[___]-'  |
                   | .0penBucket |
                   `'-.,_____,.-''
-
-                ░▀▀█▀▀░▀▀█▀░█▀▄▀█░░
-                ░░ █ ░░▄█▄▄░█░▀░█░░
-
-             C0d3d by TheZakMan with <3
+             
 
 ## Usage
 <pre>
