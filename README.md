@@ -27,4 +27,4 @@ positional arguments:
 It's a quick and dirty project so issues are welcome and pull requests are appreciated.
 
 ### Contributors
-  * [TheZakMan](https://twitter.com/TheZakMan)
+  * [TheZakMan](https://tzm.ink/)
