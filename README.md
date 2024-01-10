@@ -1,6 +1,20 @@
 # OpenBucket
 A tool to dump all contents of an public/exposed/open bucket
 
+                  ,.--'`````'--., 
+                 (\'-.,_____,.-'/)
+                  \\-.,_____,.-//
+                  ;\\         //|
+                  | \\_ ___ _// |
+                  |  '-[___]-'  |
+                  | .0penBucket |
+                  `'-.,_____,.-''
+
+                ░▀▀█▀▀░▀▀█▀░█▀▄▀█░░
+                ░░ █ ░░▄█▄▄░█░▀░█░░
+
+             C0d3d by TheZakMan with <3
+
 ## Usage
 <pre>
 usage: OpenBucket.py bucket_url
