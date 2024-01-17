@@ -8,6 +8,8 @@ import xml.etree.ElementTree as ElementTree
 import requests
 import urllib.parse
 from urllib.parse import urlparse
+from concurrent.futures import ThreadPoolExecutor, as_completed
+
 
 version = "1.4"
 # OpenBucket
@@ -53,32 +55,41 @@ def create_directory_structure(path):
         os.makedirs(path)
 
 def download_file(bucket_url, key, out_folder):
-    file_path = os.path.join(out_folder, key)
-    directory = os.path.dirname(file_path)
+    try:
+        if key.endswith('/'):  # Skip directories
+            return
 
-    # Cloning the structure 
-    create_directory_structure(directory)
+        adjusted_key = key.replace('//', '/double_slash/')
+        file_path = os.path.join(out_folder, adjusted_key)
+        directory = os.path.dirname(file_path)
 
-    # Download all the files!
-    file_url = urllib.parse.urljoin(bucket_url, urllib.parse.quote(key))
-    print(f'[+] Downloading {file_url}')
-    r = requests.get(file_url)
+        create_directory_structure(directory)
 
-    if r.status_code == 200:
-        with open(file_path, 'wb') as f:
-            f.write(r.content)
-    else:
-        print(f'[!] Failed to download {file_url}. HTTP Status Code: {r.status_code}')
+        file_url = bucket_url.rstrip('/') + '/' + adjusted_key.replace('/double_slash/', '//')
+        print(f'[+] Downloading {file_url}')
+        r = requests.get(file_url)
+
+        if r.status_code == 200:
+            with open(file_path, 'wb') as f:
+                f.write(r.content)
+        else:
+            print(f'[!] Failed to download {file_url} ==> HTTP Status Code: {r.status_code}')
+    except Exception as e:
+        print(f'[!] Error downloading {file_url}: {e}')
 
 def parse_xml(bucket_list_result, bucket_url, out_folder):
     tree = ElementTree.parse(bucket_list_result)
     root = tree.getroot()
     namespace = get_namespace(root)
 
-    for content in root.findall(f'{namespace}Contents'):
-        key = content.find(f'{namespace}Key').text
-        if '/' in key:  # check if 'key' is a file in a subfolder
-            download_file(bucket_url, key, out_folder)
+    # Define a ThreadPoolExecutor with a reasonable number of threads
+    with ThreadPoolExecutor(max_workers=10) as executor:
+        futures = [executor.submit(download_file, bucket_url, content.find(f'{namespace}Key').text, out_folder) 
+                   for content in root.findall(f'{namespace}Contents') if '/' in content.find(f'{namespace}Key').text]
+
+        for future in as_completed(futures):
+            future.result()  # This will re-raise any exceptions caught
+
 
 def retrieve_bucket_list_result(url, out_folder):
     print(f'[+] Downloading bucket list result from {url}')
